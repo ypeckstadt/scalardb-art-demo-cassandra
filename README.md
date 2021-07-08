@@ -1,1 +1,1 @@
-#Scalar DB art demo using Cassandra
+# Scalar DB art demo using Cassandra
