@@ -16,7 +16,7 @@ import java.io.IOException;
 public class LocallyConfiguredCassandraFactory implements ScalarDbFactory {
     private static final String SCALARDB_PROPERTIES = "scalardb.properties";
 
-    private DatabaseConfig dbConfiguration = null;
+    private DatabaseConfig dbConfiguration;
 
     public LocallyConfiguredCassandraFactory() throws IOException {
         dbConfiguration =
