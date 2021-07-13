@@ -36,7 +36,6 @@ public class AccountDao {
 
     public void put(String accountId, int balance, long createdAt, DistributedTransaction transaction) throws DaoException {
         Put put = createPutWith(accountId, balance, createdAt);
-        put.withConsistency(Consistency.LINEARIZABLE);
         try {
             transaction.put(put);
         } catch (CrudException e) {
@@ -71,7 +70,6 @@ public class AccountDao {
     public AccountRecord get(String accountId, DistributedTransaction transaction) throws DaoException {
         AccountRecord record = null;
         Get get = createGetWith(accountId);
-        get.withConsistency(Consistency.LINEARIZABLE);
         try {
             Optional<Result> optResult = transaction.get(get);
 
@@ -102,7 +100,6 @@ public class AccountDao {
 
     public boolean exists(String accountId, DistributedTransaction transaction) throws DaoException {
         Get get = createGetWith(accountId);
-        get.withConsistency(Consistency.LINEARIZABLE);
         try {
             return transaction.get(get).isPresent();
         } catch (CrudException e) {

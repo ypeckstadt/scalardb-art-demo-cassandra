@@ -35,7 +35,6 @@ public class ArtDao {
 
     public boolean exists(String artId, DistributedTransaction transaction) throws DaoException {
         Get get = createGetWith(artId);
-        get.withConsistency(Consistency.LINEARIZABLE);
         try {
             return transaction.get(get).isPresent();
         } catch (CrudException e) {
@@ -57,7 +56,6 @@ public class ArtDao {
 
     public void put(String artId, String accountId, int price, long createdAt, DistributedTransaction transaction) throws DaoException {
         Put put = createPutWith(artId, accountId, price, createdAt);
-        put.withConsistency(Consistency.LINEARIZABLE);
         try {
             transaction.put(put);
         } catch (CrudException e) {
@@ -92,7 +90,6 @@ public class ArtDao {
     public ArtRecord get(String artId, DistributedTransaction transaction) throws DaoException {
         ArtRecord record = null;
         Get get = createGetWith(artId);
-        get.withConsistency(Consistency.LINEARIZABLE);
         try {
             Optional<Result> optResult = transaction.get(get);
 
