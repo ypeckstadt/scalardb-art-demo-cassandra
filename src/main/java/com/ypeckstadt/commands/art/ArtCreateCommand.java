@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
-        name = "create"
+        name = "add"
 )
 public class ArtCreateCommand implements Callable {
 

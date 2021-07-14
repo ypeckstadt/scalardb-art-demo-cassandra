@@ -19,6 +19,6 @@ public abstract class ArtService {
     public abstract ArtRecord create(String artId, String accountId, int price) throws Exception;
     public abstract ArtRecord changeOwner(String currentOwnerAccountId, String newOwnerAccountId, String artId) throws Exception;
     public abstract ArtRecord view(String accountId, String artId) throws Exception;
-    public abstract ArtRecord purchase(String artId, String accountId) throws  Exception;
+    public abstract ArtRecord purchase(String artId, String buyerAccountId, String sellerAccountId) throws  Exception;
     public abstract List<ArtRecord> list(String accountId) throws  Exception;
 }

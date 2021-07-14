@@ -33,6 +33,7 @@ public class ArtListCommand implements Callable {
     public Integer call() {
         try {
             List<ArtRecord> list = artService.list(accountId);
+            LOG.info("The following art has been found:");
             for (ArtRecord record : list) {
                LOG.info(record.toString());
             }

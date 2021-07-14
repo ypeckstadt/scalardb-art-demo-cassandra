@@ -79,17 +79,17 @@ public class ArtServiceForStorage extends ArtService {
     }
 
     @Override
-    public ArtRecord purchase(String artId, String accountId) throws  Exception {
+    public ArtRecord purchase(String artId, String buyerAccountId, String sellerAccountId) throws  Exception {
 
         try {
             // check if the art exists
-            ArtRecord artRecord = artDao.get(accountId, artId, storage);
+            ArtRecord artRecord = artDao.get(sellerAccountId, artId, storage);
             if (artRecord == null) {
                 throw new Exception("the art does not exist");
             }
 
             // check if new owner exists
-            AccountRecord accountRecord = accountDao.get(accountId, storage);
+            AccountRecord accountRecord = accountDao.get(buyerAccountId, storage);
             if (accountRecord == null) {
                 throw new Exception("the account of the new owner does not exist");
             }
@@ -99,14 +99,17 @@ public class ArtServiceForStorage extends ArtService {
                 throw new Exception("the buyer's account has insufficient funds");
             }
 
+            // remove current key (art partition key is the account id)
+            artDao.delete(sellerAccountId, artId, storage);
+
             // update art, change owner
-            artDao.put(artId, accountId, artRecord.getPrice(), artRecord.getCreatedAt(), storage);
+            artDao.put(artId, buyerAccountId, artRecord.getPrice(), artRecord.getCreatedAt(), storage);
 
             // update account, update balance
-            accountDao.put(accountId, accountRecord.getBalance() - artRecord.getPrice(), accountRecord.getCreatedAt(), storage);
+            accountDao.put(buyerAccountId, accountRecord.getBalance() - artRecord.getPrice(), accountRecord.getCreatedAt(), storage);
 
             // retrieve and return art
-            return artDao.get(accountId, artId, storage);
+            return artDao.get(buyerAccountId, artId, storage);
         } catch (DaoException e) {
             throw  new Exception("something went wrong while trying to purchase the art");
         }

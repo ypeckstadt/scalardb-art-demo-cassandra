@@ -21,8 +21,11 @@ public class ArtPurchaseCommand implements Callable {
     @CommandLine.Option(names = {"-id", "--artId"}, paramLabel = "ART ID", description = "the art id", required = true)
     String artId;
 
-    @CommandLine.Option(names = {"-b", "--buyer"}, paramLabel = "BUYER", description = "the art buyer's id", required = true)
-    String ownerId;
+    @CommandLine.Option(names = {"-b", "--buyer"}, paramLabel = "BUYER", description = "buyer's account id", required = true)
+    String buyerAccountId;
+
+    @CommandLine.Option(names = {"-s", "--seller"}, paramLabel = "BUYER", description = "seller's account id", required = true)
+    String sellerAccountId;
 
     private final ArtService artService;
     private final AccountService accountService;
@@ -36,8 +39,8 @@ public class ArtPurchaseCommand implements Callable {
     @Override
     public Integer call() {
         try {
-            ArtRecord artRecord = artService.purchase(artId, ownerId);
-            AccountRecord accountRecord = accountService.view(ownerId);
+            ArtRecord artRecord = artService.purchase(artId, buyerAccountId, sellerAccountId);
+            AccountRecord accountRecord = accountService.view(buyerAccountId);
             LOG.info("the purchase of the art has been successfully completed");
             LOG.info(artRecord);
             LOG.info(accountRecord);

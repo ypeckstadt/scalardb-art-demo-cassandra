@@ -33,3 +33,18 @@ load-schema-transaction:
 	@echo "Loading schema for transaction mode ..."
 	@java -jar scalar-schema-standalone-3.0.0.jar --cassandra -h localhost -u user -p pass -f fixtures/artDemo.transaction.json -R 1
 	@echo "Schema loaded"
+
+#### Scenario test
+.PHONY: run-scenario
+run-scenario:
+	@./gradlew run --args="account add -id account_1"
+	@./gradlew run --args="account add -id account_2"
+	@./gradlew run --args="account charge -id account_2 -a 15000"
+	@./gradlew run --args="art add -id art_1 -o account_1 -p 10000"
+	@./gradlew run --args="art purchase -id art_1 -b account_2 -s account_1"
+	@./gradlew run --args="account view -id account_2"
+	@./gradlew run --args="art list -o account_2"
+	@./gradlew run --args="art changeOwner -id art_1 -co account_2 -no account_1"
+	@./gradlew run --args="art list -o account_1"
+
+
