@@ -7,14 +7,11 @@ import com.ypeckstadt.dao.account.AccountDao;
 import com.ypeckstadt.dao.account.AccountRecord;
 import com.ypeckstadt.dao.art.ArtDao;
 import com.ypeckstadt.dao.art.ArtRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class ArtServiceForStorage extends ArtService {
 
     private final DistributedStorage storage;
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public ArtServiceForStorage(ArtDao artDao, AccountDao accountDao, ScalarDbManager scalarDbManager) {
         super(artDao, accountDao);
