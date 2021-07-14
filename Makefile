@@ -41,7 +41,7 @@ run-scenario:
 	@./gradlew run --args="account add -id account_2"
 	@./gradlew run --args="account charge -id account_2 -a 15000"
 	@./gradlew run --args="art add -id art_1 -o account_1 -p 10000"
-	@./gradlew run --args="art purchase -id art_1 -b account_2 -s account_1"
+	@./gradlew run --args="art buy -id art_1 -b account_2 -s account_1"
 	@./gradlew run --args="account view -id account_2"
 	@./gradlew run --args="art list -o account_2"
 	@./gradlew run --args="art changeOwner -id art_1 -co account_2 -no account_1"

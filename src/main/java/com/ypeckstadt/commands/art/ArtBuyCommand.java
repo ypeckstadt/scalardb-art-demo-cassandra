@@ -12,11 +12,11 @@ import javax.inject.Inject;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
-        name = "purchase"
+        name = "buy"
 )
-public class ArtPurchaseCommand implements Callable {
+public class ArtBuyCommand implements Callable {
 
-    private static final Logger LOG = LogManager.getLogger(ArtPurchaseCommand.class);
+    private static final Logger LOG = LogManager.getLogger(ArtBuyCommand.class);
 
     @CommandLine.Option(names = {"-id", "--artId"}, paramLabel = "ART ID", description = "the art id", required = true)
     String artId;
@@ -31,7 +31,7 @@ public class ArtPurchaseCommand implements Callable {
     private final AccountService accountService;
 
     @Inject
-    public ArtPurchaseCommand(ArtService artService, AccountService accountService) {
+    public ArtBuyCommand(ArtService artService, AccountService accountService) {
         this.artService = artService;
         this.accountService = accountService;
     }

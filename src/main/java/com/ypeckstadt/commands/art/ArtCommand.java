@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
         description = "manage art",
         subcommands = {
                 ArtCreateCommand.class,
-                ArtPurchaseCommand.class,
+                ArtBuyCommand.class,
                 ArtChangeOwnerCommand.class,
                 ArtViewCommand.class,
                 ArtListCommand.class,
