@@ -118,7 +118,7 @@ Create a new account by supplying the `id` which is string and can be anything. 
 *Command*
 
 ```
-./gradlew run --args="account create -id <accountName>"
+./gradlew run --args="account add -id <accountName>"
 ```
 
 *CLI output*
@@ -198,7 +198,7 @@ View art details
 *Command*
 
 ```
-./gradlew run --args="art view -id <art id>"
+./gradlew run --args="art view -art <art id> -acc <owner account id>"
 ```
 
 *CLI output*
@@ -210,14 +210,14 @@ View art details
 
 
 
-##### Purchase art
+##### Buy art
 
 Buy the art via an account. After the balance of the account is validated and credited, the ownership of the art is transfered to the new account. In case of insufficient funds, an error message is shown in the CLI.
 
 *Command*
 
 ```
-./gradlew run --args="art purchase -id <art id> -b <buyer's account id>"
+./gradlew run --args="art buy -id <art id> -b <buyer's account id> -s <seller's account id>"
 ```
 
 *CLI output*
@@ -237,7 +237,7 @@ Replace the art's owner id (account id) with a new one. No funds are transferred
 *Command*
 
 ```
-./gradlew run --args="art changeOwner -id <art id> -o <new owner's account id>"
+./gradlew run --args="art changeOwner -id <art id> -co <current owner's account id> -no <new owner's account id>"
 ```
 
 *CLI output*
@@ -247,14 +247,15 @@ Replace the art's owner id (account id) with a new one. No funds are transferred
 [INFO ] 2021-07-07 15:08:44.513 [main] ArtChangeOwnerCommand - Art : id hola, owner testAccount2, price 102, createdAt 1625637767
 ```
 
+##### List all art for an account
 
+List all the art that belongs to one specific account id.
 
+*Command*
 
-
-
-
-
-
+```
+./gradlew run --args="art list -o <owner account id>"
+```
 
 
 
