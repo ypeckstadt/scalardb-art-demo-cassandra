@@ -7,10 +7,14 @@ import com.ypeckstadt.dao.account.AccountDao;
 import com.ypeckstadt.dao.account.AccountRecord;
 import com.ypeckstadt.dao.art.ArtDao;
 import com.ypeckstadt.dao.art.ArtRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.List;
 
 public class ArtServiceForStorage extends ArtService {
 
     private final DistributedStorage storage;
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public ArtServiceForStorage(ArtDao artDao, AccountDao accountDao, ScalarDbManager scalarDbManager) {
         super(artDao, accountDao);
@@ -18,10 +22,10 @@ public class ArtServiceForStorage extends ArtService {
     }
 
     @Override
-    public ArtRecord create(String id, String accountId, int price) throws Exception {
+    public ArtRecord create(String artId, String accountId, int price) throws Exception {
 
         // Check if art exists
-        if (artDao.exists(id, storage)) {
+        if (artDao.exists(accountId, artId, storage)) {
             throw new Exception("the art already exists");
         }
 
@@ -31,40 +35,43 @@ public class ArtServiceForStorage extends ArtService {
         }
 
         // Save new art
-        artDao.put(id, accountId, price, System.currentTimeMillis(), storage);
+        artDao.put(artId, accountId, price, System.currentTimeMillis(), storage);
 
         // Retrieve record and return
-        return artDao.get(id, storage);
+        return artDao.get(accountId, artId, storage);
     }
 
     @Override
-    public ArtRecord changeOwner(String id, String accountId) throws Exception {
+    public ArtRecord changeOwner(String currentOwnerAccountId, String newOwnerAccountId, String artId) throws Exception {
         try {
             // check if the art exists
-            ArtRecord artRecord = artDao.get(id, storage);
+            ArtRecord artRecord = artDao.get(currentOwnerAccountId, artId, storage);
             if (artRecord == null) {
                 throw new Exception("the art does not exist");
             }
 
             // check if new owner exists
-            if (!accountDao.exists(accountId, storage)) {
+            if (!accountDao.exists(newOwnerAccountId, storage)) {
                 throw new Exception("the account of the new owner does not exist");
             }
 
+            // remove current key (art partition key is the account id)
+            artDao.delete(currentOwnerAccountId, artId, storage);
+
             // update the art
-            artDao.put(id, accountId, artRecord.getPrice(), artRecord.getCreatedAt(), storage);
+            artDao.put(artId, newOwnerAccountId, artRecord.getPrice(), artRecord.getCreatedAt(), storage);
 
             // retrieve and return
-            return artDao.get(id, storage);
+            return artDao.get(newOwnerAccountId, artId, storage);
         } catch (DaoException e) {
             throw new Exception("something went wrong while trying to change the art's owner");
         }
     }
 
     @Override
-    public ArtRecord view(String id) throws Exception {
+    public ArtRecord view(String accountId, String artId) throws Exception {
         try {
-            ArtRecord artRecord = artDao.get(id, storage);
+            ArtRecord artRecord = artDao.get(accountId, artId, storage);
             if (artRecord == null) {
                 throw new Exception("the art could not be found");
             }
@@ -75,11 +82,11 @@ public class ArtServiceForStorage extends ArtService {
     }
 
     @Override
-    public ArtRecord purchase(String id, String accountId) throws  Exception {
+    public ArtRecord purchase(String artId, String accountId) throws  Exception {
 
         try {
             // check if the art exists
-            ArtRecord artRecord = artDao.get(id, storage);
+            ArtRecord artRecord = artDao.get(accountId, artId, storage);
             if (artRecord == null) {
                 throw new Exception("the art does not exist");
             }
@@ -96,15 +103,24 @@ public class ArtServiceForStorage extends ArtService {
             }
 
             // update art, change owner
-            artDao.put(id, accountId, artRecord.getPrice(), artRecord.getCreatedAt(), storage);
+            artDao.put(artId, accountId, artRecord.getPrice(), artRecord.getCreatedAt(), storage);
 
             // update account, update balance
             accountDao.put(accountId, accountRecord.getBalance() - artRecord.getPrice(), accountRecord.getCreatedAt(), storage);
 
             // retrieve and return art
-            return artDao.get(id, storage);
+            return artDao.get(accountId, artId, storage);
         } catch (DaoException e) {
             throw  new Exception("something went wrong while trying to purchase the art");
+        }
+    }
+
+    @Override
+    public List<ArtRecord> list(String accountId) throws Exception {
+        try {
+            return artDao.list(accountId, storage);
+        } catch (DaoException e) {
+            throw new Exception("Error retrieving art for account " + accountId, e);
         }
     }
 }

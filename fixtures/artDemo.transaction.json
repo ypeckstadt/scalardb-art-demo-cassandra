@@ -15,9 +15,11 @@
   "artDemo.art": {
     "transaction": true,
     "partition-key": [
+      "account_id"
+    ],
+    "clustering-key": [
       "art_id"
     ],
-    "clustering-key": [],
     "columns": {
       "art_id": "TEXT",
       "account_id": "TEXT",

@@ -12,6 +12,8 @@ import com.ypeckstadt.dao.account.AccountRecord;
 import com.ypeckstadt.dao.art.ArtDao;
 import com.ypeckstadt.dao.art.ArtRecord;
 
+import java.util.List;
+
 public class ArtServiceForTransaction extends ArtService {
 
     private final DistributedTransactionManager transactionManager;
@@ -22,14 +24,14 @@ public class ArtServiceForTransaction extends ArtService {
     }
 
     @Override
-    public ArtRecord create(String id, String accountId, int price) throws Exception {
+    public ArtRecord create(String artId, String accountId, int price) throws Exception {
 
         // start the transaction
         DistributedTransaction transaction = transactionManager.start();
 
         try {
             // Check if art exists
-            if (artDao.exists(id, transaction)) {
+            if (artDao.exists(accountId, artId, transaction)) {
                 transaction.abort();
                 throw new Exception("the art already exists");
             }
@@ -41,65 +43,68 @@ public class ArtServiceForTransaction extends ArtService {
             }
 
             // Save new art
-            artDao.put(id, accountId, price, System.currentTimeMillis(), transaction);
+            artDao.put(artId, accountId, price, System.currentTimeMillis(), transaction);
 
             // Commit transaction
             transaction.commit();
         } catch (CommitException | DaoException e) {
             transaction.abort();
-            throw new ServiceException("Could not insert insert account " + id + " in database", e);
+            throw new ServiceException("Could not insert insert account " + artId + " in database", e);
         } catch (UnknownTransactionStatusException e) {
             throw new UnknownTransactionStatusException(
                     "Error : the transaction to insert the account is in an unknown state", e);
         }
 
         // Retrieve record and return
-        return view(id);
+        return view(accountId, artId);
     }
 
     @Override
-    public ArtRecord changeOwner(String id, String accountId) throws Exception {
+    public ArtRecord changeOwner(String currentOwnerAccountId, String newOwnerAccountId, String artId) throws Exception {
 
         // start the transaction
         DistributedTransaction transaction = transactionManager.start();
 
         try {
             // check if the art exists
-            ArtRecord artRecord = artDao.get(id, transaction);
+            ArtRecord artRecord = artDao.get(currentOwnerAccountId, artId, transaction);
             if (artRecord == null) {
                 transaction.abort();
                 throw new Exception("the art does not exist");
             }
 
             // check if new owner exists
-            if (!accountDao.exists(accountId, transaction)) {
+            if (!accountDao.exists(newOwnerAccountId, transaction)) {
                 transaction.abort();
                 throw new Exception("the account of the new owner does not exist");
             }
 
+            // remove current key (art partition key is the account id)
+            artDao.delete(currentOwnerAccountId, artId, transaction);
+
             // update the art
-            artDao.put(id, accountId, artRecord.getPrice(), artRecord.getCreatedAt(), transaction);
+            artDao.put(artId, newOwnerAccountId, artRecord.getPrice(), artRecord.getCreatedAt(), transaction);
 
             // Commit transaction
             transaction.commit();
         } catch (CommitException | DaoException e) {
             transaction.abort();
-            throw new ServiceException("Could not insert insert account " + id + " in database", e);
+            throw new ServiceException("Could not insert insert account " + artId + " in database", e);
         } catch (UnknownTransactionStatusException e) {
             throw new UnknownTransactionStatusException(
                     "Error : the transaction to insert the account is in an unknown state", e);
         }
 
-        return view(id);
+        return view(newOwnerAccountId, artId);
     }
 
     @Override
-    public ArtRecord view(String id) throws Exception {
+    public ArtRecord view(String accountId, String artId) throws Exception {
         DistributedTransaction transaction = transactionManager.start();
 
         ArtRecord artRecord;
         try {
-            artRecord = artDao.get(id, transaction);
+            artRecord = artDao.get(accountId, artId, transaction);
             if (artRecord == null) {
                 transaction.abort();
                 throw new Exception("the art does not exist");
@@ -107,7 +112,7 @@ public class ArtServiceForTransaction extends ArtService {
             transaction.commit();
         } catch (CommitException | DaoException e) {
             transaction.abort();
-            throw new ServiceException("Could not retrieve data of art " + id, e);
+            throw new ServiceException("Could not retrieve data of art " + artId, e);
         } catch (UnknownTransactionStatusException e) {
             throw new UnknownTransactionStatusException(
                     "Error : the transaction to retrieve the art is in an unknown state", e);
@@ -117,7 +122,7 @@ public class ArtServiceForTransaction extends ArtService {
     }
 
     @Override
-    public ArtRecord purchase(String id, String accountId) throws Exception {
+    public ArtRecord purchase(String artId, String accountId) throws Exception {
 
         // start the transaction
         DistributedTransaction transaction = transactionManager.start();
@@ -125,7 +130,7 @@ public class ArtServiceForTransaction extends ArtService {
         try {
 
             // check if the art exists
-            ArtRecord artRecord = artDao.get(id, transaction);
+            ArtRecord artRecord = artDao.get(accountId, artId, transaction);
             if (artRecord == null) {
                 transaction.abort();
                 throw new Exception("the art does not exist");
@@ -145,7 +150,7 @@ public class ArtServiceForTransaction extends ArtService {
             }
 
             // update art, change owner
-            artDao.put(id, accountId, artRecord.getPrice(), artRecord.getCreatedAt(), transaction);
+            artDao.put(artId, accountId, artRecord.getPrice(), artRecord.getCreatedAt(), transaction);
 
             // update account, update balance
             accountDao.put(accountId, accountRecord.getBalance() - artRecord.getPrice(), accountRecord.getCreatedAt(), transaction);
@@ -154,11 +159,16 @@ public class ArtServiceForTransaction extends ArtService {
             transaction.commit();
         } catch (CommitException | DaoException e) {
             transaction.abort();
-            throw new ServiceException("Could not insert insert account " + id + " in database", e);
+            throw new ServiceException("Could not insert insert account " + artId + " in database", e);
         } catch (UnknownTransactionStatusException e) {
             throw new UnknownTransactionStatusException(
                     "Error : the transaction to insert the account is in an unknown state", e);
         }
-        return view(id);
+        return view(accountId, artId);
+    }
+
+    @Override
+    public List<ArtRecord> list(String accountId) throws Exception {
+        return null;
     }
 }

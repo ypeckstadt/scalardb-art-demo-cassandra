@@ -16,8 +16,11 @@ public class ArtViewCommand implements Callable {
 
     private static final Logger LOG = LogManager.getLogger(ArtViewCommand.class);
 
-    @CommandLine.Option(names = {"-id", "--artId"}, paramLabel = "ART ID", description = "the art id", required = true)
+    @CommandLine.Option(names = {"-art", "--artId"}, paramLabel = "ART ID", description = "the art id", required = true)
     String artId;
+
+    @CommandLine.Option(names = {"-acc", "--accountId"}, paramLabel = "ACCOUNT ID", description = "the account id", required = true)
+    String accountId;
 
     private final ArtService artService;
 
@@ -29,7 +32,7 @@ public class ArtViewCommand implements Callable {
     @Override
     public Integer call() {
         try {
-            ArtRecord artRecord = artService.view(artId);
+            ArtRecord artRecord = artService.view(accountId, artId);
             LOG.info("the art has been found");
             LOG.info(artRecord.toString());
         } catch (Exception e) {

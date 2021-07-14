@@ -19,8 +19,11 @@ public class ArtChangeOwnerCommand implements Callable {
     @CommandLine.Option(names = {"-id", "--artId"}, paramLabel = "ART ID", description = "the art id", required = true)
     String artId;
 
-    @CommandLine.Option(names = {"-o", "--owner"}, paramLabel = "NEW OWNER", description = "the art's new owner id", required = true)
-    String newOwnerId;
+    @CommandLine.Option(names = {"-co", "--currentOwner"}, paramLabel = "CURRENT OWNER", description = "the art's current owner id", required = true)
+    String currentOwnerAccountId;
+
+    @CommandLine.Option(names = {"-no", "--newOwner"}, paramLabel = "NEW OWNER", description = "the art's new owner id", required = true)
+    String newOwnerAccountId;
 
     private final ArtService artService;
 
@@ -32,7 +35,7 @@ public class ArtChangeOwnerCommand implements Callable {
     @Override
     public Integer call() {
         try {
-            ArtRecord artRecord = artService.changeOwner(artId, newOwnerId);
+            ArtRecord artRecord = artService.changeOwner(currentOwnerAccountId, newOwnerAccountId, artId);
             LOG.info("the art's owner has been updated successfully");
             LOG.info(artRecord.toString());
         } catch (Exception e) {

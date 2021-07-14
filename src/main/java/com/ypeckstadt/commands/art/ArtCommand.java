@@ -11,7 +11,8 @@ import java.util.concurrent.Callable;
                 ArtCreateCommand.class,
                 ArtPurchaseCommand.class,
                 ArtChangeOwnerCommand.class,
-                ArtViewCommand.class
+                ArtViewCommand.class,
+                ArtListCommand.class,
         }
 )
 public class ArtCommand implements Callable<Integer> {

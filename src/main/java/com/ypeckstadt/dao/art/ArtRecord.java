@@ -9,8 +9,8 @@ public class ArtRecord {
     private final int price;
     private final long createdAt;
 
-    public ArtRecord(String id, String accountId, int price, long createdAt) {
-        this.id = id;
+    public ArtRecord(String artId, String accountId, int price, long createdAt) {
+        this.id = artId;
         this.accountId = accountId;
         this.price = price;
         this.createdAt = createdAt;
