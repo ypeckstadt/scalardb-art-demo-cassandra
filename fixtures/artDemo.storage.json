@@ -1,0 +1,37 @@
+{
+  "artDemo.account": {
+    "transaction": false,
+    "partition-key": [
+      "account_id"
+    ],
+    "clustering-key": [
+    ],
+    "columns": {
+      "account_id": "TEXT",
+      "balance": "INT",
+      "created_at": "BIGINT"
+    }
+  },
+  "artDemo.art": {
+    "transaction": false,
+    "partition-key": [
+      "account_id"
+    ],
+    "clustering-key": [
+      "art_id"
+    ],
+    "columns": {
+      "art_id": "TEXT",
+      "account_id": "TEXT",
+      "price": "INT",
+      "created_at": "BIGINT"
+    }
+  }
+}
+
+
+
+
+
+
+
